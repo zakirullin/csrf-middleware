@@ -43,6 +43,7 @@ class CSRF implements MiddlewareInterface
     protected const METHODS = ['POST'];
     protected const STATUS_ON_ERROR = 403;
     protected const CERTIFICATE_SEPARATOR = ':';
+    protected const ATTRIBUTE = 'csrf';
     protected const TTL = 60 * 20;
     protected const ALGORITHM = 'ripemd160';
 
@@ -58,7 +59,7 @@ class CSRF implements MiddlewareInterface
         callable $shouldProtect,
         callable $getIdentity,
         string $secret,
-        string $attribute,
+        string $attribute = self::ATTRIBUTE,
         int $ttl = self::TTL,
         string $algorithm = self::ALGORITHM
     ) {
@@ -102,7 +103,11 @@ class CSRF implements MiddlewareInterface
     protected function add(ServerRequestInterface $request): ServerRequestInterface
     {
         $identity = call_user_func($this->getIdentity, $request);
-        if (is_array($identity)) {
+        if (!empty($identity)) {
+            if (!is_array($identity)) {
+                $identity = [$identity];
+            }
+
             $expireAt = time() + $this->ttl;
             $certificate = $this->createCertificate($identity, $expireAt);
             $signature = hash_hmac($this->algorithm, $certificate, $this->secret);

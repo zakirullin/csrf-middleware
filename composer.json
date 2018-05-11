@@ -23,14 +23,16 @@
         "php": "^7.1",
         "psr/http-message": "^1.0.1",
         "psr/http-server-middleware": "^1.0",
-        "middlewares/utils": "^1.0"
+        "middlewares/utils": "^1.0",
+        "zendframework/zend-diactoros": "^1.7.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.5.5"
     },
     "autoload": {
         "psr-4": {
-            "Zakirullin\\Middlewares\\": "src/"
+            "Zakirullin\\Middlewares\\": "src/",
+            "Zakirullin\\Middlewares\\Tests": "tests/"
         }
     }
 }

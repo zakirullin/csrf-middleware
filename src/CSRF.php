@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Zakirullin\Middlewares;
 
@@ -124,7 +125,7 @@ class CSRF implements MiddlewareInterface
      */
     protected function verify(ServerRequestInterface $request): bool
     {
-        $token = $request->getParsedBody()[$this->attribute] ?? null;
+        $token = $request->getParsedBody()[$this->attribute] ?? '';
         $parts = explode(static::CERTIFICATE_SEPARATOR, $token);
         if (count($parts) > 1) {
             list($expireAt, $signature) = explode(static::CERTIFICATE_SEPARATOR, $token);

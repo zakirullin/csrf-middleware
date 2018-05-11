@@ -1,0 +1,36 @@
+{
+    "name": "zakirullin/csrf-middleware",
+    "description": "PSR-15 middleware to manage CSRF verification",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Artem Zakirullin",
+            "email": "artem.zakirullin@gmail.com"
+        }
+    ],
+    "keywords": [
+        "csrf",
+        "psr-15",
+        "psr-7",
+        "middleware",
+        "server",
+        "http",
+        "token"
+    ],
+    "homepage": "https://github.com/zakirullin/csrf-middleware",
+    "require": {
+        "php": "^7.1",
+        "psr/http-message": "^1.0.1",
+        "psr/http-server-middleware": "^1.0",
+        "middlewares/utils": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.5.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Zakirullin\\Middlewares\\": "src/"
+        }
+    }
+}

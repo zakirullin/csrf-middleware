@@ -66,6 +66,4 @@ The attribute name used to store the session in the server request. By default i
 
 ---
 
-Please see [CHANGELOG](CHANGELOG.md) for more information about recent changes and [CONTRIBUTING](CONTRIBUTING.md) for contributing details.
-
 The MIT License (MIT). Please see [LICENSE](LICENSE) for more information.

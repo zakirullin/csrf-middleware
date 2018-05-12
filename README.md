@@ -5,7 +5,7 @@
 [![Build Status][ico-travis]][link-travis]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-Middleware to handle CSRF token verification
+PSR-15 middleware to handle CSRF-token verification"
 
 ## Requirements
 
@@ -60,7 +60,16 @@ return [
 
 ## Options
 
-#### `__construct(callable $shouldProtect, callable $getIdentity, string $secret, string $attribute = self::ATTRIBUTE, int $ttl = self::TTL, string $algorithm = self::ALGORITHM)`
+```php 
+__construct(
+    callable $shouldProtect,
+    callable $getIdentity,
+    string $secret,
+    string $attribute = self::ATTRIBUTE,
+    int $ttl = self::TTL,
+    string $algorithm = self::ALGORITHM
+)
+```
 
 #### `name(string $name)`
 

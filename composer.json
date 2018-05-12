@@ -1,6 +1,6 @@
 {
     "name": "zakirullin/csrf-middleware",
-    "description": "PSR-15 middleware to manage CSRF verification",
+    "description": "PSR-15 middleware to handle CSRF-token verification",
     "type": "library",
     "license": "MIT",
     "authors": [

@@ -8,7 +8,6 @@ use Middlewares\Utils\Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Zakirullin\Middlewares\CSRF;
 
 class CSRFTest extends TestCase
 {
@@ -106,6 +105,29 @@ class CSRFTest extends TestCase
         $this->assertContains('Invalid', (string)$response->getBody());
     }
 
+    public function testExpiredToken()
+    {
+        $request = Factory::createServerRequest([], 'POST');
+        $token = implode(':', [0, '0d163df2868bcc2dd15e1a7ae72528ed130354d3']);
+        $request = $request->withParsedBody([static::ATTRIBUTE => $token]);
+
+        $csrfMiddleware = $this->getCSRFMiddleware();
+        $assertMiddleware = function (ServerRequestInterface $request) {
+            $this->assertTrue(false);
+        };
+
+        $response = Dispatcher::run(
+            [
+                $csrfMiddleware,
+                $assertMiddleware
+            ],
+            $request
+        );
+
+        $this->assertEquals($response->getStatusCode(), 403);
+        $this->assertContains($response->getBody()->getContents(), 'Invalid');
+    }
+
     public function testValidToken()
     {
         $request = Factory::createServerRequest([], 'POST');
@@ -136,29 +158,6 @@ class CSRFTest extends TestCase
         $this->assertContains((string)$response->getBody(), 'success');
     }
 
-    public function testExpiredToken()
-    {
-        $request = Factory::createServerRequest([], 'POST');
-        $token = implode(':', [0, '0d163df2868bcc2dd15e1a7ae72528ed130354d3']);
-        $request = $request->withParsedBody([static::ATTRIBUTE => $token]);
-
-        $csrfMiddleware = $this->getCSRFMiddleware();
-        $assertMiddleware = function (ServerRequestInterface $request) {
-            $this->assertTrue(false);
-        };
-
-        $response = Dispatcher::run(
-            [
-                $csrfMiddleware,
-                $assertMiddleware
-            ],
-            $request
-        );
-
-        $this->assertEquals($response->getStatusCode(), 403);
-        $this->assertContains($response->getBody()->getContents(), 'Invalid');
-    }
-
     protected function getCSRFMiddleware(callable $getIdentity = null)
     {
         if ($getIdentity === null) {
@@ -178,5 +177,4 @@ class CSRFTest extends TestCase
 
         return $csrfMiddleware;
     }
-
 }

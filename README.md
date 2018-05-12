@@ -1,13 +1,11 @@
-# middlewares/aura-session
+# zakirullin/csrf-middleware
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE)
 [![Build Status][ico-travis]][link-travis]
-[![Quality Score][ico-scrutinizer]][link-scrutinizer]
 [![Total Downloads][ico-downloads]][link-downloads]
-[![SensioLabs Insight][ico-sensiolabs]][link-sensiolabs]
 
-Middleware to manage sessions using [Aura.Session](https://github.com/auraphp/Aura.Session).
+Middleware to handle CSRF token verification
 
 ## Requirements
 
@@ -17,32 +15,52 @@ Middleware to manage sessions using [Aura.Session](https://github.com/auraphp/Au
 
 ## Installation
 
-This package is installable and autoloadable via Composer as [middlewares/aura-session](https://packagist.org/packages/middlewares/aura-session).
+This package is installable and autoloadable via Composer as [zakirullin/csrf-middleware](https://packagist.org/packages/zakirullin/csrf-middleware).
 
 ```sh
-composer require middlewares/aura-session
+composer require zakirullin/csrf-middleware 
 ```
 
 ## Example
 
 ```php
-$dispatcher = new Dispatcher([
-	new Middlewares\AuraSession(),
 
-    function ($request) {
-        //get the session object
-        $session = $request->getAttribute('session');
+<?php
+return [
+    \Zakirullin\Middlewares\CSRF::class => function (\App\Interfaces\ConfigInterface $config) {
+        $shouldProtect = function (\Psr\Http\Message\ServerRequestInterface $request) {
+            $handler = $request->getAttribute(\App\Entities\RequestAttribute::HANDLER);
+            list($controller,) = $handler;
+            return in_array(
+                $controller,
+                [
+                    \App\Controllers\Admin\VideoController::class,
+                    \App\Controllers\Admin\UserController::class
+                ]
+            );
+        };
+        $getIdentity = function (\Psr\Http\Message\ServerRequestInterface $request) {
+            $session = $request->getAttribute(\App\Entities\RequestAttribute::SESSION);
+            if ($session instanceof \PSR7Sessions\Storageless\Session\SessionInterface) {
+                $userId = (int)$session->get(\App\Entities\Session::AUTH, 0);
+                if ($userId > 0) {
+                    $handler = $request->getAttribute(\App\Entities\RequestAttribute::HANDLER);
+                    list($controller, $action) = $handler;
+                    return [$userId, $controller, $action];
+                }
+            }
+            return false;
+        };
+        return new \App\Middlewares\CSRF(
+            $shouldProtect, $getIdentity, $config->get('csrf.secret'), \App\Entities\RequestAttribute::CSRF
+        );
     }
-]);
-
-$response = $dispatcher->dispatch(new ServerRequest());
+];
 ```
 
 ## Options
 
-#### `__construct(Aura\Session\SessionFactory $factory = null)`
-
-To use a custom session factory. If it's not passed, it will be created automatically.
+#### `__construct(callable $shouldProtect, callable $getIdentity, string $secret, string $attribute = self::ATTRIBUTE, int $ttl = self::TTL, string $algorithm = self::ALGORITHM)`
 
 #### `name(string $name)`
 
@@ -58,15 +76,11 @@ Please see [CHANGELOG](CHANGELOG.md) for more information about recent changes a
 
 The MIT License (MIT). Please see [LICENSE](LICENSE) for more information.
 
-[ico-version]: https://img.shields.io/packagist/v/middlewares/aura-session.svg?style=flat-square
+[ico-version]: https://img.shields.io/packagist/v/zakirullin/csrf-middleware.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/middlewares/aura-session/master.svg?style=flat-square
-[ico-scrutinizer]: https://img.shields.io/scrutinizer/g/middlewares/aura-session.svg?style=flat-square
-[ico-downloads]: https://img.shields.io/packagist/dt/middlewares/aura-session.svg?style=flat-square
-[ico-sensiolabs]: https://img.shields.io/sensiolabs/i/174fe6b4-f522-49e4-9bab-2c7bf212d389.svg?style=flat-square
+[ico-travis]: https://img.shields.io/travis/zakirullin/csrf-middleware/master.svg?style=flat-square
+[ico-downloads]: https://img.shields.io/packagist/dt/zakirullin/csrf-middleware.svg?style=flat-square
 
-[link-packagist]: https://packagist.org/packages/middlewares/aura-session
-[link-travis]: https://travis-ci.org/middlewares/aura-session
-[link-scrutinizer]: https://scrutinizer-ci.com/g/middlewares/aura-session
-[link-downloads]: https://packagist.org/packages/middlewares/aura-session
-[link-sensiolabs]: https://insight.sensiolabs.com/projects/174fe6b4-f522-49e4-9bab-2c7bf212d389
+[link-packagist]: https://packagist.org/packages/zakirullin/csrf-middleware
+[link-travis]: https://travis-ci.org/zakirullin/csrf-middleware
+[link-downloads]: https://packagist.org/packages/zakirullin/csrf-middleware

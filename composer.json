@@ -32,7 +32,7 @@
     "autoload": {
         "psr-4": {
             "Zakirullin\\Middlewares\\": "src/",
-            "Zakirullin\\Middlewares\\Tests": "tests/"
+            "Zakirullin\\Middlewares\\Tests\\": "tests/"
         }
     }
 }

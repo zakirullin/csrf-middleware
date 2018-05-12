@@ -23,29 +23,33 @@ This package is installable and autoloadable via Composer as [zakirullin/csrf-mi
 composer require zakirullin/csrf-middleware 
 ```
 
-## Example
+## PHP
 
 ```php
-    $shouldProtect = function (\Psr\Http\Message\ServerRequestInterface $request) {
-        $handler = $request->getAttribute('handler');
-        return $handler != 'login';
-    };
-    $getIdentity = function (\Psr\Http\Message\ServerRequestInterface $request) {
-        $session = $request->getAttribute('session');
-        return [$session->get('userId')];
-    };
+$shouldProtect = function (\Psr\Http\Message\ServerRequestInterface $request) {
+    $handler = $request->getAttribute('handler');
+    return $handler != 'login';
+};
+$getIdentity = function (\Psr\Http\Message\ServerRequestInterface $request) {
+    $session = $request->getAttribute('session');
+    return [$session->get('userId')];
+};
 
-    $dispatcher = new Dispatcher([
-	...
-	new \Zakirullin\Middlewares\CSRF($shouldProtect, $getIdentity, 'secret'),
-	...
-    ]);
+$dispatcher = new Dispatcher([
+    ...
+    new \Zakirullin\Middlewares\CSRF($shouldProtect, $getIdentity, 'secret'),
+    ...
+]);
 ```
 
+## HTML
+
 ```html
-    <form method="POST" action="/dangerous/action">
-	<input type="hidden" name="csrf" value="<?= $request->getAttribute('csrf') ?>">
-    </form>
+<form method="POST" action="/dangerous/action">
+    ...
+    <input type="hidden" name="csrf" value="<?= $request->getAttribute('csrf') ?>">
+    ...
+</form>
 ```
 
 ## Options

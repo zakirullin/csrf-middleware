@@ -1,17 +1,17 @@
 # zakirullin/csrf-middleware
 
-[![Build Status](https://travis-ci.org/zakirullin/csrf-middleware.svg)](https://travis-ci.org/zakirullin/csrf-middleware)
-[![Scrutinizer](https://img.shields.io/scrutinizer/g/zakirullin/csrf-middleware.svg)](https://scrutinizer-ci.com/g/zakirullin/csrf-middleware/)
-[![Packagist](https://img.shields.io/packagist/v/zakirullin/csrf-middleware.svg)](https://packagist.org/packages/zakirullin/csrf-middlware)
-![PHP from Packagist](https://img.shields.io/packagist/php-v/zakirullin/csrf-middleware.svg)
-![GitHub commits](https://img.shields.io/github/commits-since/zakirullin/csrf-middleware/0.1.0.svg)
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
+[![Build Status](https://img.shields.io/travis/zakirullin/csrf-middleware.svg?style=flat-square)](https://travis-ci.org/zakirullin/csrf-middleware)
+[![Scrutinizer](https://img.shields.io/scrutinizer/g/zakirullin/csrf-middleware.svg?style=flat-square)](https://scrutinizer-ci.com/g/zakirullin/csrf-middleware/)
+[![Packagist](https://img.shields.io/packagist/v/zakirullin/csrf-middleware.svg?style=flat-square)](https://packagist.org/packages/zakirullin/csrf-middlware)
+![PHP from Packagist](https://img.shields.io/packagist/php-v/zakirullin/csrf-middleware.svg?style=flat-square)
+![GitHub commits](https://img.shields.io/github/commits-since/zakirullin/csrf-middleware/0.1.0.svg?style=flat-square)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
 PSR-15 middleware to handle CSRF-token verification
 
 ## Requirements
 
-* PHP >= 7.0
+* PHP >= 7.1
 * A [PSR-7](https://packagist.org/providers/psr/http-message-implementation) http message implementation ([Diactoros](https://github.com/zendframework/zend-diactoros), [Guzzle](https://github.com/guzzle/psr7), [Slim](https://github.com/slimphp/Slim), etc...)
 * A [PSR-15 middleware dispatcher](https://github.com/middlewares/awesome-psr15-middlewares#dispatcher)
 
@@ -26,38 +26,21 @@ composer require zakirullin/csrf-middleware
 ## Example
 
 ```php
+    $shouldProtect = function (\Psr\Http\Message\ServerRequestInterface $request) {
+        $handler = $request->getAttribute('handler');
+        return $handler != 'login';
+    };
+    $getIdentity = function (\Psr\Http\Message\ServerRequestInterface $request) {
+        $session = $request->getAttribute('session');
+        return false;
+    };
 
-<?php
-return [
-    \Zakirullin\Middlewares\CSRF::class => function (\App\Interfaces\ConfigInterface $config) {
-        $shouldProtect = function (\Psr\Http\Message\ServerRequestInterface $request) {
-            $handler = $request->getAttribute(\App\Entities\RequestAttribute::HANDLER);
-            list($controller,) = $handler;
-            return in_array(
-                $controller,
-                [
-                    \App\Controllers\Admin\VideoController::class,
-                    \App\Controllers\Admin\UserController::class
-                ]
-            );
-        };
-        $getIdentity = function (\Psr\Http\Message\ServerRequestInterface $request) {
-            $session = $request->getAttribute(\App\Entities\RequestAttribute::SESSION);
-            if ($session instanceof \PSR7Sessions\Storageless\Session\SessionInterface) {
-                $userId = (int)$session->get(\App\Entities\Session::AUTH, 0);
-                if ($userId > 0) {
-                    $handler = $request->getAttribute(\App\Entities\RequestAttribute::HANDLER);
-                    list($controller, $action) = $handler;
-                    return [$userId, $controller, $action];
-                }
-            }
-            return false;
-        };
-        return new \App\Middlewares\CSRF(
-            $shouldProtect, $getIdentity, $config->get('csrf.secret'), \App\Entities\RequestAttribute::CSRF
-        );
-    }
-];
+    $dispatcher = new Dispatcher([
+	    new \Zakirullin\Middlewares\CSRF($shouldProtect, $getIdentity, 'secret'),
+        function (\Psr\Http\Message\ServerRequestInterface $request) {
+            $token = $request->getAttribute('csrf');
+        }
+    ]);
 ```
 
 ## Options

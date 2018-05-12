@@ -32,15 +32,20 @@ composer require zakirullin/csrf-middleware
     };
     $getIdentity = function (\Psr\Http\Message\ServerRequestInterface $request) {
         $session = $request->getAttribute('session');
-        return false;
+        return $session->get('userId');;
     };
 
     $dispatcher = new Dispatcher([
+	...
 	new \Zakirullin\Middlewares\CSRF($shouldProtect, $getIdentity, 'secret'),
-        function (\Psr\Http\Message\ServerRequestInterface $request) {
-            $token = $request->getAttribute('csrf');
-        }
+	...
     ]);
+```
+
+```html
+    <form method="POST" action="/dangerous/action">
+	<input type="hidden" name="csrf" value="<?= $request->getAttribute('csrf') ?>">
+    </form>
 ```
 
 ## Options

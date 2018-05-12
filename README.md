@@ -36,7 +36,7 @@ composer require zakirullin/csrf-middleware
     };
 
     $dispatcher = new Dispatcher([
-	    new \Zakirullin\Middlewares\CSRF($shouldProtect, $getIdentity, 'secret'),
+	new \Zakirullin\Middlewares\CSRF($shouldProtect, $getIdentity, 'secret'),
         function (\Psr\Http\Message\ServerRequestInterface $request) {
             $token = $request->getAttribute('csrf');
         }

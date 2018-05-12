@@ -1,9 +1,11 @@
 # zakirullin/csrf-middleware
 
-[![Latest Version on Packagist][ico-version]][link-packagist]
-[![Software License][ico-license]](LICENSE)
-[![Build Status][ico-travis]][link-travis]
-[![Total Downloads][ico-downloads]][link-downloads]
+[![Build Status](https://travis-ci.org/zakirullin/csrf-middleware.svg)](https://travis-ci.org/zakirullin/csrf-middleware)
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
+[![Packagist](https://img.shields.io/packagist/v/zakirullin/csrf-middleware.svg)](https://packagist.org/packages/zakirullin/csrf-middlware)
+[![Total Downloads](https://img.shields.io/packagist/dt/zakirullin/csrf-middleware.svg)](https://packagist.org/packages/zakirullin/csrf-middleware)
+![PHP from Packagist](https://img.shields.io/packagist/php-v/zakirullin/csrf-middleware.svg)
+
 
 PSR-15 middleware to handle CSRF-token verification
 
@@ -84,12 +86,3 @@ The attribute name used to store the session in the server request. By default i
 Please see [CHANGELOG](CHANGELOG.md) for more information about recent changes and [CONTRIBUTING](CONTRIBUTING.md) for contributing details.
 
 The MIT License (MIT). Please see [LICENSE](LICENSE) for more information.
-
-[ico-version]: https://img.shields.io/packagist/v/zakirullin/csrf-middleware.svg?style=flat-square
-[ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/zakirullin/csrf-middleware/master.svg?style=flat-square
-[ico-downloads]: https://img.shields.io/packagist/dt/zakirullin/csrf-middleware.svg?style=flat-square
-
-[link-packagist]: https://packagist.org/packages/zakirullin/csrf-middleware
-[link-travis]: https://travis-ci.org/zakirullin/csrf-middleware
-[link-downloads]: https://packagist.org/packages/zakirullin/csrf-middleware

@@ -1,7 +1,7 @@
 # zakirullin/csrf-middleware
 
 [![Build Status](https://travis-ci.org/zakirullin/csrf-middleware.svg)](https://travis-ci.org/zakirullin/csrf-middleware)
-[![Packagist](https://img.shields.io/packagist/ver/zakirullin/csrf-middleware.svg)](https://packagist.org/packages/zakirullin/csrf-middlware)
+[![Packagist](https://img.shields.io/packagist/v/zakirullin/csrf-middleware.svg)](https://packagist.org/packages/zakirullin/csrf-middlware)
 [![Total Downloads](https://img.shields.io/packagist/dt/zakirullin/csrf-middleware.svg)](https://packagist.org/packages/zakirullin/csrf-middleware)
 ![PHP from Packagist](https://img.shields.io/packagist/php-v/zakirullin/csrf-middleware.svg)
 ![GitHub commits](https://img.shields.io/github/commits-since/zakirullin/csrf-middleware/0.1.0.svg)

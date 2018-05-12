@@ -2,7 +2,6 @@
 
 [![Build Status](https://img.shields.io/travis/zakirullin/csrf-middleware.svg?style=flat-square)](https://travis-ci.org/zakirullin/csrf-middleware)
 [![Scrutinizer](https://img.shields.io/scrutinizer/g/zakirullin/csrf-middleware.svg?style=flat-square)](https://scrutinizer-ci.com/g/zakirullin/csrf-middleware/)
-[![Packagist](https://img.shields.io/packagist/v/zakirullin/csrf-middleware.svg?style=flat-square)](https://packagist.org/packages/zakirullin/csrf-middlware)
 ![PHP from Packagist](https://img.shields.io/packagist/php-v/zakirullin/csrf-middleware.svg?style=flat-square)
 ![GitHub commits](https://img.shields.io/github/commits-since/zakirullin/csrf-middleware/0.1.0.svg?style=flat-square)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)

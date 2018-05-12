@@ -49,16 +49,16 @@ class CSRF implements MiddlewareInterface
     protected const ALGORITHM = 'ripemd160';
 
     /**
-     * @param callable $shouldProtect
-     * @param callable $getIdentity
+     * @param callable $shouldProtectCallback
+     * @param callable $getIdentityCallback
      * @param string $secret
      * @param string $attribute
      * @param int $ttl
      * @param string $algorithm
      */
     public function __construct(
-        callable $shouldProtect,
-        callable $getIdentity,
+        callable $shouldProtectCallback,
+        callable $getIdentityCallback,
         string $secret,
         string $attribute = self::ATTRIBUTE,
         int $ttl = self::TTL,

@@ -14,7 +14,7 @@ class CSRFTest extends TestCase
     const ATTRIBUTE = 'custom-attribute';
 
     /**
-     * @covers \Zakirullin\Middlewares\CSRF::class
+     * @covers \Zakirullin\Middlewares\CSRF
      */
     public function testAttribute()
     {
@@ -32,7 +32,7 @@ class CSRFTest extends TestCase
     }
 
     /**
-     * @covers \Zakirullin\Middlewares\CSRF::class
+     * @covers \Zakirullin\Middlewares\CSRF
      */
     public function testNoProtection()
     {
@@ -69,7 +69,7 @@ class CSRFTest extends TestCase
     }
 
     /**
-     * @covers \Zakirullin\Middlewares\CSRF::class
+     * @covers \Zakirullin\Middlewares\CSRF
      */
     public function testMissingToken()
     {
@@ -93,7 +93,7 @@ class CSRFTest extends TestCase
     }
 
     /**
-     * @covers \Zakirullin\Middlewares\CSRF::verify()
+     * @covers \Zakirullin\Middlewares\CSRF
      */
     public function testInvalidToken()
     {
@@ -118,7 +118,7 @@ class CSRFTest extends TestCase
     }
 
     /**
-     * @covers \Zakirullin\Middlewares\CSRF::verify()
+     * @covers \Zakirullin\Middlewares\CSRF
      */
     public function testExpiredToken()
     {
@@ -144,7 +144,7 @@ class CSRFTest extends TestCase
     }
 
     /**
-     * @covers \Zakirullin\Middlewares\CSRF::verify()
+     * @covers \Zakirullin\Middlewares\CSRF
      */
     public function testValidToken()
     {

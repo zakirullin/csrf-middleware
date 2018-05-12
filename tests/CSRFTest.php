@@ -13,6 +13,9 @@ class CSRFTest extends TestCase
 {
     const ATTRIBUTE = 'custom-attribute';
 
+    /**
+     * @covers \Zakirullin\Middlewares\CSRF::class
+     */
     public function testAttribute()
     {
         $csrfMiddleware = $this->getCSRFMiddleware();
@@ -28,6 +31,9 @@ class CSRFTest extends TestCase
         );
     }
 
+    /**
+     * @covers \Zakirullin\Middlewares\CSRF::class
+     */
     public function testNoProtection()
     {
         $request = Factory::createServerRequest([], 'POST');
@@ -62,6 +68,9 @@ class CSRFTest extends TestCase
         $this->assertEquals((string)$response->getBody(), 'success');
     }
 
+    /**
+     * @covers \Zakirullin\Middlewares\CSRF::class
+     */
     public function testMissingToken()
     {
         $request = Factory::createServerRequest([], 'POST');
@@ -83,6 +92,9 @@ class CSRFTest extends TestCase
         $this->assertContains('Invalid', (string)$response->getBody());
     }
 
+    /**
+     * @covers \Zakirullin\Middlewares\CSRF::verify()
+     */
     public function testInvalidToken()
     {
         $request = Factory::createServerRequest([], 'POST');
@@ -105,6 +117,9 @@ class CSRFTest extends TestCase
         $this->assertContains('Invalid', (string)$response->getBody());
     }
 
+    /**
+     * @covers \Zakirullin\Middlewares\CSRF::verify()
+     */
     public function testExpiredToken()
     {
         $request = Factory::createServerRequest([], 'POST');
@@ -128,6 +143,9 @@ class CSRFTest extends TestCase
         $this->assertContains($response->getBody()->getContents(), 'Invalid');
     }
 
+    /**
+     * @covers \Zakirullin\Middlewares\CSRF::verify()
+     */
     public function testValidToken()
     {
         $request = Factory::createServerRequest([], 'POST');

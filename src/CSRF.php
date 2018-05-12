@@ -107,7 +107,7 @@ class CSRF implements MiddlewareInterface
         if (!empty($identity)) {
             $expireAt = time() + $this->ttl;
             $certificate = $this->createCertificate($identity, $expireAt);
-            $signature = hash_hmac($this->algorithm, $certificate, $this->secret);
+            $signature = $this->signCertificate($certificate);
             $signatureWithExpiration = implode(static::CERTIFICATE_SEPARATOR, [$expireAt, $signature]);
 
             $request = $request->withAttribute($this->attribute, $signatureWithExpiration);
@@ -128,8 +128,7 @@ class CSRF implements MiddlewareInterface
             list($expireAt, $signature) = explode(static::CERTIFICATE_SEPARATOR, $token);
             $identity = $this->getIdentity($request);
             $certificate = $this->createCertificate($identity, (int)$expireAt);
-
-            $actualSignature = hash_hmac($this->algorithm, $certificate, $this->secret);
+            $actualSignature = $this->signCertificate($certificate);
             $isSignatureValid = hash_equals($actualSignature, $signature);
             $isNotExpired = $expireAt > time();
             if ($isSignatureValid && $isNotExpired) {
@@ -150,6 +149,15 @@ class CSRF implements MiddlewareInterface
         $identity[] = $expireAt;
 
         return implode(static::CERTIFICATE_SEPARATOR, $identity);
+    }
+
+    /**
+     * @param string $certificate
+     * @return string
+     */
+    protected function signCertificate(string $certificate)
+    {
+        return hash_hmac($this->algorithm, $certificate, $this->secret);
     }
 
     /**

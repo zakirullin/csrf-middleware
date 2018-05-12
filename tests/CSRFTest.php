@@ -180,6 +180,3 @@ class CSRFTest extends TestCase
     }
 
 }
-
-//e14a5ae5132d4e4b489d74698144104055c25f4c
-

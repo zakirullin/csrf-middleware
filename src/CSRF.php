@@ -64,8 +64,8 @@ class CSRF implements MiddlewareInterface
         int $ttl = self::TTL,
         string $algorithm = self::ALGORITHM
     ) {
-        $this->shouldProtectCallback = $shouldProtect;
-        $this->getIdentityCallback = $getIdentity;
+        $this->shouldProtectCallback = $shouldProtectCallback;
+        $this->getIdentityCallback = $getIdentityCallback;
         $this->secret = $secret;
         $this->attribute = $attribute;
         $this->ttl = $ttl;

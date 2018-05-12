@@ -5,7 +5,7 @@
 [![Build Status][ico-travis]][link-travis]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-PSR-15 middleware to handle CSRF-token verification"
+PSR-15 middleware to handle CSRF-token verification
 
 ## Requirements
 

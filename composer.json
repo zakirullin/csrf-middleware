@@ -34,5 +34,11 @@
             "Zakirullin\\Middlewares\\": "src/",
             "Zakirullin\\Middlewares\\Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "test": [
+            "phpunit --stderr --coverage-text"
+        ],
+        "coverage": "phpunit --coverage-html=coverage"
     }
 }

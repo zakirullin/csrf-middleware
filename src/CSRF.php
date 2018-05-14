@@ -14,11 +14,6 @@ class CSRF implements MiddlewareInterface
     /**
      * @var callable
      */
-    protected $shouldProtectCallback;
-
-    /**
-     * @var callable
-     */
     protected $getIdentityCallback;
 
     /**
@@ -41,7 +36,7 @@ class CSRF implements MiddlewareInterface
      */
     protected $algorithm;
 
-    protected const METHODS = ['POST'];
+    protected const READ_METHODS = ['HEAD', 'GET', 'OPTIONS'];
     protected const STATUS_ON_ERROR = 403;
     protected const CERTIFICATE_SEPARATOR = ':';
     protected const ATTRIBUTE = 'csrf';
@@ -49,7 +44,6 @@ class CSRF implements MiddlewareInterface
     protected const ALGORITHM = 'ripemd160';
 
     /**
-     * @param callable $shouldProtectCallback
      * @param callable $getIdentityCallback
      * @param string $secret
      * @param string $attribute
@@ -57,14 +51,12 @@ class CSRF implements MiddlewareInterface
      * @param string $algorithm
      */
     public function __construct(
-        callable $shouldProtectCallback,
         callable $getIdentityCallback,
         string $secret,
         string $attribute = self::ATTRIBUTE,
         int $ttl = self::TTL,
         string $algorithm = self::ALGORITHM
     ) {
-        $this->shouldProtectCallback = $shouldProtectCallback;
         $this->getIdentityCallback = $getIdentityCallback;
         $this->secret = $secret;
         $this->attribute = $attribute;
@@ -79,20 +71,17 @@ class CSRF implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $shouldProtect = call_user_func($this->shouldProtectCallback, $request);
-        if ($shouldProtect) {
-            $shouldProtectMethod = in_array($request->getMethod(), static::METHODS);
-            if ($shouldProtectMethod) {
-                if (!$this->verify($request)) {
-                    $response = Factory::createResponse(static::STATUS_ON_ERROR);
-                    $response->getBody()->write('Invalid or missing CSRF token!');
+        $isWriteMethod = !in_array($request->getMethod(), static::READ_METHODS);
+        if ($isWriteMethod) {
+            if (!$this->verify($request)) {
+                $response = Factory::createResponse(static::STATUS_ON_ERROR);
+                $response->getBody()->write('Invalid or missing CSRF token!');
 
-                    return $response;
-                }
+                return $response;
             }
-
-            $request = $this->add($request);
         }
+
+        $request = $this->add($request);
 
         return $handler->handle($request);
     }

@@ -34,23 +34,11 @@ class CSRFTest extends TestCase
     /**
      * @covers \Zakirullin\Middlewares\CSRF
      */
-    public function testNoProtection()
+    public function testNonWrite()
     {
-        $request = Factory::createServerRequest([], 'POST');
-        $request = $request->withAttribute('handler', 'LoginController');
-
-        $csrfMiddleware = $this->getCSRFMiddleware(
-            function (ServerRequestInterface $request) {
-                return $request->getAttribute('handler', null) != 'LoginController';
-            }
-        );
-        $assertMiddleware = function (ServerRequestInterface $request, RequestHandlerInterface $handler) {
-            $this->assertNull($request->getAttribute(static::ATTRIBUTE));
-
-            return $handler->handle($request);
-        };
-        $appMiddleware = function (ServerRequestInterface $request, RequestHandlerInterface $handler) {
-            $response = Factory::createResponse();
+        $csrfMiddleware = $this->getCSRFMiddleware();
+        $appMiddleware = function (ServerRequestInterface $request) {
+            $response = Factory::createResponse(200);
             $response->getBody()->write('success');
 
             return $response;
@@ -59,13 +47,11 @@ class CSRFTest extends TestCase
         $response = Dispatcher::run(
             [
                 $csrfMiddleware,
-                $assertMiddleware,
                 $appMiddleware
-            ],
-            $request
+            ]
         );
 
-        $this->assertEquals((string)$response->getBody(), 'success');
+        $this->assertEquals('success', (string)$response->getBody());
     }
 
     /**
@@ -176,16 +162,9 @@ class CSRFTest extends TestCase
         $this->assertContains((string)$response->getBody(), 'success');
     }
 
-    protected function getCSRFMiddleware(callable $getIdentity = null)
+    protected function getCSRFMiddleware()
     {
-        if ($getIdentity === null) {
-            $getIdentity = function () {
-                return true;
-            };
-        }
-
         $csrfMiddleware = new \Zakirullin\Middlewares\CSRF(
-            $getIdentity,
             function () {
                 return ['identity'];
             },

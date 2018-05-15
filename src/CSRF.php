@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace Zakirullin\Middlewares;
 
@@ -12,9 +12,9 @@ use Middlewares\Utils\Factory;
 class CSRF implements MiddlewareInterface
 {
     /**
-     * @var string $identity
+     * @var callable
      */
-    protected $identity;
+    protected $getIdentityCallback;
 
     /**
      * @var string
@@ -44,20 +44,20 @@ class CSRF implements MiddlewareInterface
     protected const ALGORITHM = 'ripemd160';
 
     /**
-     * @param string $identity
+     * @param callable $getIdentityCallback
      * @param string $secret
      * @param string $attribute
      * @param int $ttl
      * @param string $algorithm
      */
     public function __construct(
-        string $identity,
+        callable $getIdentityCallback,
         string $secret,
         string $attribute = self::ATTRIBUTE,
         int $ttl = self::TTL,
         string $algorithm = self::ALGORITHM
     ) {
-        $this->identity = $identity;
+        $this->getIdentityCallback = $getIdentityCallback;
         $this->secret = $secret;
         $this->attribute = $attribute;
         $this->ttl = $ttl;
@@ -92,12 +92,17 @@ class CSRF implements MiddlewareInterface
      */
     protected function add(ServerRequestInterface $request): ServerRequestInterface
     {
-        $expireAt = time() + $this->ttl;
-        $certificate = $this->createCertificate($this->identity, $expireAt);
-        $signature = $this->signCertificate($certificate);
-        $signatureWithExpiration = implode(static::CERTIFICATE_SEPARATOR, [$expireAt, $signature]);
+        $identity = $this->getIdentity($request);
+        if (!empty($identity)) {
+            $expireAt = time() + $this->ttl;
+            $certificate = $this->createCertificate($identity, $expireAt);
+            $signature = $this->signCertificate($certificate);
+            $signatureWithExpiration = implode(static::CERTIFICATE_SEPARATOR, [$expireAt, $signature]);
 
-        return $request->withAttribute($this->attribute, $signatureWithExpiration);
+            $request = $request->withAttribute($this->attribute, $signatureWithExpiration);
+        }
+
+        return $request;
     }
 
     /**
@@ -110,7 +115,8 @@ class CSRF implements MiddlewareInterface
         $parts = explode(static::CERTIFICATE_SEPARATOR, $token);
         if (count($parts) > 1) {
             list($expireAt, $signature) = explode(static::CERTIFICATE_SEPARATOR, $token);
-            $certificate = $this->createCertificate($this->identity, (int)$expireAt);
+            $identity = $this->getIdentity($request);
+            $certificate = $this->createCertificate($identity, (int)$expireAt);
             $actualSignature = $this->signCertificate($certificate);
             $isSignatureValid = hash_equals($actualSignature, $signature);
             $isNotExpired = $expireAt > time();
@@ -123,13 +129,15 @@ class CSRF implements MiddlewareInterface
     }
 
     /**
-     * @param string $identity
+     * @param array $identity
      * @param int $expireAt
      * @return string
      */
-    protected function createCertificate(string $identity, int $expireAt): string
+    protected function createCertificate(array $identity, int $expireAt): string
     {
-        return implode(static::CERTIFICATE_SEPARATOR, [$identity, $expireAt]);
+        $identity[] = $expireAt;
+
+        return implode(static::CERTIFICATE_SEPARATOR, $identity);
     }
 
     /**
@@ -139,5 +147,19 @@ class CSRF implements MiddlewareInterface
     protected function signCertificate(string $certificate)
     {
         return hash_hmac($this->algorithm, $certificate, $this->secret);
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return array
+     */
+    protected function getIdentity(ServerRequestInterface $request)
+    {
+        $identity = call_user_func($this->getIdentityCallback, $request);
+        if (!is_array($identity)) {
+            $identity = [$identity];
+        }
+
+        return $identity;
     }
 }

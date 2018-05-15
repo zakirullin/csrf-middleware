@@ -25,13 +25,9 @@ composer require zakirullin/csrf-middleware
 ## PHP
 
 ```php
-$shouldProtect = function (\Psr\Http\Message\ServerRequestInterface $request) {
-    $handler = $request->getAttribute('handler');
-    return $handler != 'login';
-};
 $getIdentity = function (\Psr\Http\Message\ServerRequestInterface $request) {
     $session = $request->getAttribute('session');
-    return [$session->get('userId')];
+    return $session->get('userId');
 };
 
 $dispatcher = new Dispatcher([
@@ -55,7 +51,6 @@ $dispatcher = new Dispatcher([
 
 ```php 
 __construct(
-    callable $shouldProtect,
     callable $getIdentity,
     string $secret,
     string $attribute = self::ATTRIBUTE,
@@ -64,13 +59,9 @@ __construct(
 )
 ```
 
-#### `name(string $name)`
+#### `$getIdentity(ServerRequestInterface $request)`
 
-The session name. If it's not defined, the default `PHPSESSID` will be used.
-
-#### `attribute(string $attribute)`
-
-The attribute name used to store the session in the server request. By default is `session`.
+A callback that should return a string containing some per-user unique identity. For example - `session id`.
 
 ---
 

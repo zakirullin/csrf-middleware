@@ -27,7 +27,7 @@ composer require zakirullin/csrf-middleware
 ```php
 $getIdentity = function (\Psr\Http\Message\ServerRequestInterface $request) {
     $session = $request->getAttribute('session');
-    return $session->get('userId');
+    return $session->get('id');
 };
 
 $dispatcher = new Dispatcher([

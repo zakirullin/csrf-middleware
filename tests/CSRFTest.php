@@ -166,7 +166,7 @@ class CSRFTest extends TestCase
     {
         $csrfMiddleware = new \Zakirullin\Middlewares\CSRF(
             function () {
-                return ['identity'];
+                return 'identity';
             },
             'secret',
             static::ATTRIBUTE

@@ -92,7 +92,7 @@ class CSRF implements MiddlewareInterface
      */
     protected function add(ServerRequestInterface $request): ServerRequestInterface
     {
-        $identity = $this->getIdentity($request);
+        $identity = call_user_func($this->getIdentityCallback, $request);
         if (!empty($identity)) {
             $expireAt = time() + $this->ttl;
             $certificate = $this->createCertificate($identity, $expireAt);
@@ -115,7 +115,7 @@ class CSRF implements MiddlewareInterface
         $parts = explode(static::CERTIFICATE_SEPARATOR, $token);
         if (count($parts) > 1) {
             list($expireAt, $signature) = explode(static::CERTIFICATE_SEPARATOR, $token);
-            $identity = $this->getIdentity($request);
+            $identity = call_user_func($this->getIdentityCallback, $request);
             $certificate = $this->createCertificate($identity, (int)$expireAt);
             $actualSignature = $this->signCertificate($certificate);
             $isSignatureValid = hash_equals($actualSignature, $signature);
@@ -129,15 +129,13 @@ class CSRF implements MiddlewareInterface
     }
 
     /**
-     * @param array $identity
+     * @param string $identity
      * @param int $expireAt
      * @return string
      */
-    protected function createCertificate(array $identity, int $expireAt): string
+    protected function createCertificate(string $identity, int $expireAt): string
     {
-        $identity[] = $expireAt;
-
-        return implode(static::CERTIFICATE_SEPARATOR, $identity);
+        return implode(static::CERTIFICATE_SEPARATOR, [$identity, $expireAt]);
     }
 
     /**
@@ -147,19 +145,5 @@ class CSRF implements MiddlewareInterface
     protected function signCertificate(string $certificate)
     {
         return hash_hmac($this->algorithm, $certificate, $this->secret);
-    }
-
-    /**
-     * @param ServerRequestInterface $request
-     * @return array
-     */
-    protected function getIdentity(ServerRequestInterface $request)
-    {
-        $identity = call_user_func($this->getIdentityCallback, $request);
-        if (!is_array($identity)) {
-            $identity = [$identity];
-        }
-
-        return $identity;
     }
 }

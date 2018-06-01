@@ -72,7 +72,7 @@ class CSRF implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $isWriteMethod = !in_array($request->getMethod(), static::READ_METHODS);
-        if ($isWriteMethod && !$this->verify($request)) {
+        if ($isWriteMethod && !$this->isValid($request)) {
             $response = Factory::createResponse(static::STATUS_ON_ERROR);
             $response->getBody()->write('Invalid or missing CSRF token!');
 
@@ -107,7 +107,7 @@ class CSRF implements MiddlewareInterface
      * @param ServerRequestInterface $request
      * @return bool
      */
-    protected function verify(ServerRequestInterface $request): bool
+    protected function isValid(ServerRequestInterface $request): bool
     {
         $token = trim($request->getParsedBody()[$this->attribute] ?? '');
         $parts = explode(static::CERTIFICATE_SEPARATOR, $token);

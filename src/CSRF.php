@@ -109,7 +109,7 @@ class CSRF implements MiddlewareInterface
         $parts = explode(static::CERTIFICATE_SEPARATOR, $token);
         if (count($parts) > 1) {
             list($expireAt, $signature) = explode(static::CERTIFICATE_SEPARATOR, $token);
-            $actualSignature = $this->signRequest($request, $expireAt);
+            $actualSignature = $this->signRequest($request, (int)$expireAt);
             $isSignatureValid = hash_equals($actualSignature, $signature);
             $isNotExpired = $expireAt > time();
             if ($isSignatureValid && $isNotExpired) {

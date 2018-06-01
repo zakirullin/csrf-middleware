@@ -90,15 +90,11 @@ class CSRF implements MiddlewareInterface
      */
     protected function add(ServerRequestInterface $request): ServerRequestInterface
     {
-        $identity = call_user_func($this->getIdentityCallback, $request);
-        if (!empty($identity)) {
-            $expireAt = time() + $this->ttl;
-            $certificate = $this->createCertificate($identity, $expireAt);
-            $signature = $this->signCertificate($certificate);
-            $signatureWithExpiration = implode(static::CERTIFICATE_SEPARATOR, [$expireAt, $signature]);
+        $expireAt = time() + $this->ttl;
+        $signature = $this->signRequest($request, $expireAt);
+        $signatureWithExpiration = implode(static::CERTIFICATE_SEPARATOR, [$expireAt, $signature]);
 
-            $request = $request->withAttribute($this->attribute, $signatureWithExpiration);
-        }
+        $request = $request->withAttribute($this->attribute, $signatureWithExpiration);
 
         return $request;
     }
@@ -113,9 +109,7 @@ class CSRF implements MiddlewareInterface
         $parts = explode(static::CERTIFICATE_SEPARATOR, $token);
         if (count($parts) > 1) {
             list($expireAt, $signature) = explode(static::CERTIFICATE_SEPARATOR, $token);
-            $identity = call_user_func($this->getIdentityCallback, $request);
-            $certificate = $this->createCertificate($identity, (int)$expireAt);
-            $actualSignature = $this->signCertificate($certificate);
+            $actualSignature = $this->signRequest($request, $expireAt);
             $isSignatureValid = hash_equals($actualSignature, $signature);
             $isNotExpired = $expireAt > time();
             if ($isSignatureValid && $isNotExpired) {
@@ -143,5 +137,18 @@ class CSRF implements MiddlewareInterface
     protected function signCertificate(string $certificate)
     {
         return hash_hmac($this->algorithm, $certificate, $this->secret);
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param int $expireAt
+     * @return string
+     */
+    protected function signRequest(ServerRequestInterface $request, int $expireAt)
+    {
+        $identity = call_user_func($this->getIdentityCallback, $request);
+        $certificate = $this->createCertificate($identity, $expireAt);
+
+        return $this->signCertificate($certificate);
     }
 }

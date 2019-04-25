@@ -20,13 +20,13 @@ class CSRFTest extends TestCase
     {
         $csrfMiddleware = $this->getCSRFMiddleware();
         $assertMiddleware = function (ServerRequestInterface $request) {
-            $this->assertTrue($request->getAttribute(static::ATTRIBUTE) !== null);
+            self::assertTrue($request->getAttribute(static::ATTRIBUTE) !== null);
         };
 
         Dispatcher::run(
             [
                 $csrfMiddleware,
-                $assertMiddleware
+                $assertMiddleware,
             ]
         );
     }
@@ -47,11 +47,11 @@ class CSRFTest extends TestCase
         $response = Dispatcher::run(
             [
                 $csrfMiddleware,
-                $appMiddleware
+                $appMiddleware,
             ]
         );
 
-        $this->assertEquals('success', (string)$response->getBody());
+        self::assertEquals('success', (string)$response->getBody());
     }
 
     /**
@@ -59,23 +59,23 @@ class CSRFTest extends TestCase
      */
     public function testMissingToken()
     {
-        $request = Factory::createServerRequest([], 'POST');
+        $request = Factory::createServerRequest('POST', '/');
 
         $csrfMiddleware = $this->getCSRFMiddleware();
         $assertMiddleware = function (ServerRequestInterface $request) {
-            $this->assertTrue(false);
+            self::assertTrue(false);
         };
 
         $response = Dispatcher::run(
             [
                 $csrfMiddleware,
-                $assertMiddleware
+                $assertMiddleware,
             ],
             $request
         );
 
-        $this->assertEquals($response->getStatusCode(), 403);
-        $this->assertContains('Invalid', (string)$response->getBody());
+        self::assertEquals($response->getStatusCode(), 403);
+        self::assertContains('Invalid', (string)$response->getBody());
     }
 
     /**
@@ -83,24 +83,24 @@ class CSRFTest extends TestCase
      */
     public function testInvalidToken()
     {
-        $request = Factory::createServerRequest([], 'POST');
+        $request = Factory::createServerRequest('POST', '/');
         $request = $request->withParsedBody(['csrf' => 'invalid']);
 
         $csrfMiddleware = $this->getCSRFMiddleware();
         $assertMiddleware = function (ServerRequestInterface $request) {
-            $this->assertTrue(false);
+            self::assertTrue(false);
         };
 
         $response = Dispatcher::run(
             [
                 $csrfMiddleware,
-                $assertMiddleware
+                $assertMiddleware,
             ],
             $request
         );
 
-        $this->assertEquals($response->getStatusCode(), 403);
-        $this->assertContains('Invalid', (string)$response->getBody());
+        self::assertEquals($response->getStatusCode(), 403);
+        self::assertContains('Invalid', (string)$response->getBody());
     }
 
     /**
@@ -108,25 +108,25 @@ class CSRFTest extends TestCase
      */
     public function testExpiredToken()
     {
-        $request = Factory::createServerRequest([], 'POST');
+        $request = Factory::createServerRequest('POST', '/');
         $token = implode(':', [0, '0d163df2868bcc2dd15e1a7ae72528ed130354d3']);
         $request = $request->withParsedBody([static::ATTRIBUTE => $token]);
 
         $csrfMiddleware = $this->getCSRFMiddleware();
         $assertMiddleware = function (ServerRequestInterface $request) {
-            $this->assertTrue(false);
+            self::assertTrue(false);
         };
 
         $response = Dispatcher::run(
             [
                 $csrfMiddleware,
-                $assertMiddleware
+                $assertMiddleware,
             ],
             $request
         );
 
-        $this->assertEquals($response->getStatusCode(), 403);
-        $this->assertContains($response->getBody()->getContents(), 'Invalid');
+        self::assertEquals($response->getStatusCode(), 403);
+        self::assertContains($response->getBody()->getContents(), 'Invalid');
     }
 
     /**
@@ -134,13 +134,13 @@ class CSRFTest extends TestCase
      */
     public function testValidToken()
     {
-        $request = Factory::createServerRequest([], 'POST');
+        $request = Factory::createServerRequest('POST', '/');
         $token = implode(':', [PHP_INT_MAX, 'e14a5ae5132d4e4b489d74698144104055c25f4c']);
         $request = $request->withParsedBody([static::ATTRIBUTE => $token]);
 
         $csrfMiddleware = $this->getCSRFMiddleware();
         $assertMiddleware = function (ServerRequestInterface $request) {
-            $this->assertTrue(true);
+            self::assertTrue(true);
         };
         $appMiddleware = function (ServerRequestInterface $request, RequestHandlerInterface $handler) {
             $response = Factory::createResponse();
@@ -153,15 +153,18 @@ class CSRFTest extends TestCase
             [
                 $csrfMiddleware,
                 $assertMiddleware,
-                $appMiddleware
+                $appMiddleware,
             ],
             $request
         );
 
-        $this->assertEquals($response->getStatusCode(), 200);
-        $this->assertContains((string)$response->getBody(), 'success');
+        self::assertEquals($response->getStatusCode(), 200);
+        self::assertContains((string)$response->getBody(), 'success');
     }
 
+    /**
+     * @return \Zakirullin\Middlewares\CSRF
+     */
     protected function getCSRFMiddleware()
     {
         $csrfMiddleware = new \Zakirullin\Middlewares\CSRF(

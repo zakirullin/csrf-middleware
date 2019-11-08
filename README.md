@@ -6,7 +6,7 @@
 ![GitHub commits](https://img.shields.io/github/commits-since/zakirullin/csrf-middleware/0.1.0.svg?style=flat-square)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
-PSR-15 middleware to handle CSRF-token verification
+A PSR-15 middleware to automate CSRF-token verification process
 
 ## Requirements
 
